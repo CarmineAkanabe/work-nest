@@ -25,7 +25,7 @@ class Task extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function asignee(): BelongsTo
+    public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }

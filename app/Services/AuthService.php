@@ -14,9 +14,21 @@ class AuthService
      */
     public function __construct() {}
 
-    public function register(array $data)
+    public function register(array $data): array
     {
+        // Creating user object
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'role' => $data['role']
+        ]);
 
+        // Generating token
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        // returning both user object and token
+        return ['user' => $user, 'token' => $token];
     }
 
     public function login(array $data): string

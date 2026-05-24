@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
+    // We use a constructor of the AuthService so as to maintain that iinstance, n manage memory
     public function __construct(private AuthService $authService)   {}
     public function login(LoginRequest $request)
     {
@@ -23,13 +24,17 @@ class AuthController extends Controller
         return response()->json(['token' => $token]);
     }
 
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $validatedData = $request->validated();
+        // Only Admin can create accounts
+        $this->authorize('is_admin');
 
-        $result = $this->register($validatedData);
+        $result = $this->authService->register($request->validated());
 
-        return response()->json($result, 201);
+        return response()->json([
+            'user'  => new UserResource($result['user']),
+            'token' => $result['token'],
+        ], 201);
     }
 
     public function logout(Request $request)
