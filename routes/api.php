@@ -24,13 +24,13 @@ Route::middleware('auth:sanctum')->group(function (){
     // Admin and Manager Routes (Protected with RoleMiddleware, and role 'admin'and 'manager' to string ..$roles)
     Route::middleware('role:admin,manager')->group(function () {
         Route::apiResource('projects', ProjectController::class);
-        Route::apiResource('tasks', TaskController::class);
+        Route::apiResource('tasks', TaskController::class)->except(['show', 'update']);
     });
 
-    // // Project Routes
-    // Route::apiResource('projects', ProjectController::class);
-
-    // // Task Routes
-    // Route::apiResource('tasks', TaskController::class);
+    // Admin, Manager, and Employee
+    Route::middleware('role:admin,manager,employee')->group(function () {
+        Route::get('/tasks/{task}', [TaskController::class, 'show']);
+        Route::put('/tasks/{task}', [TaskController::class, 'update']);
+    });
 
 });

@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\TaskStatus;
 use App\Enums\UserRole;
+use App\Events\TaskCompleted;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -39,10 +41,19 @@ class TaskService
 
     public function update(Task $task, array $data): Task
     {
-        // $task->update($data);
-        // return $task->fresh();
+        // Variable for the status before update
+        $previousStatus = $task->status;
+
         $task->update($data);
-        return $task->fresh()->load(['project', 'assignee']);
+        $task = $task->fresh()->load(['project', 'assignee']);
+
+        // This is where we initiate the TaskCompleted event and listeners Only if task is updated to Completed
+        // (if it was completed b4 It is left alone)
+        if (isset($data['status']) && $data['status'] === TaskStatus::Completed->value && $previousStatus !== TaskStatus::Completed) {
+            TaskCompleted::dispatch($task);
+        }
+
+        return $task;
     }
 
     public function delete(Task $task)
