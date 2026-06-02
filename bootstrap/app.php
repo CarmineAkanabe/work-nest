@@ -15,10 +15,15 @@ return Application::configure(basePath: dirname(__DIR__))
         // ForceJsonMiddleware startup
         $middleware->append(\App\Http\Middleware\ForceJsonMiddleware::class);
 
-        // Force request userroles to be within the context
+        // Force request userroles to be within the context and throttle rate limiting
         $middleware->alias([
-            'role' =>   \App\Http\Middleware\RoleMiddleware::class
+            'role' =>   \App\Http\Middleware\RoleMiddleware::class,
+            'throttle.api' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         ]);
+
+        // For IP Blacklisting
+        $middleware->append(\App\Http\Middleware\BlacklistIp::class);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
