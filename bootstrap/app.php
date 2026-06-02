@@ -12,7 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // ForceJsonMiddleware startup
+        $middleware->append(\App\Http\Middleware\ForceJsonMiddleware::class);
+
+        // Force request userroles to be within the context
+        $middleware->alias([
+            'role' =>   \App\Http\Middleware\RoleMiddleware::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

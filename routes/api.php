@@ -16,13 +16,21 @@ Route::middleware('auth:sanctum')->group(function (){
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
-    // Admin Only Routes
-    Route::post('/register', [AuthController::class, 'register']);
+    // Admin Only Routes (Protected with RoleMiddleware, and role 'admin' is sent to string ..$roles)
+    Route::middleware('role:admin')->group(function (){
+        Route::post('/register', [AuthController::class, 'register']);
+    });
 
-    // Project Routes
-    Route::apiResource('projects', ProjectController::class);
+    // Admin and Manager Routes (Protected with RoleMiddleware, and role 'admin'and 'manager' to string ..$roles)
+    Route::middleware('role:admin,manager')->group(function () {
+        Route::apiResource('projects', ProjectController::class);
+        Route::apiResource('tasks', TaskController::class);
+    });
 
-    // Task Routes
-    Route::apiResource('tasks', TaskController::class);
+    // // Project Routes
+    // Route::apiResource('projects', ProjectController::class);
+
+    // // Task Routes
+    // Route::apiResource('tasks', TaskController::class);
 
 });
